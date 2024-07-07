@@ -1,0 +1,9 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Dmitri Bajew",
+    "classifications": [ "RWP", "Blazor", "Blazor Hybrid", "WPF", "Radzen", "Scheduler" ],
+    "identity": "PersonalPlaner",
+    "name": "PersonalPlaner",
+    "shortName": "rwpPersonal", 
+    "sourceName": "PersonalPlaner"
+  }
