@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PersonalPlaner.Metro"
         mc:Ignorable="d"
                 xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
-      xmlns:app="clr-namespace:PersonalPlaner.App.Components.Layout;assembly=PersonalPlaner.App"
+      xmlns:app="clr-namespace:PersonalPlaner.Blazor.Components.Layout;assembly=PersonalPlaner.Blazor"
                  
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  TitleCharacterCasing="Normal"

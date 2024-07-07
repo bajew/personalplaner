@@ -1,0 +1,163 @@
+﻿@page "/Planer"
+
+<SectionContent SectionName="Header">
+    <RadzenLabel Text="Personal Planer" />
+</SectionContent>
+<RadzenScheduler style="height:83vh"
+                 @ref="scheduler"
+                 TodayText="Heute"
+                 TItem="Appointment"
+                 Data=@appointments StartProperty="Start" EndProperty="End"
+                 SlotRender="@OnSlotRender"
+                 TextProperty="Text"
+                 SlotSelect="@OnSlotSelect"
+                 LoadData="@OnLoadData"
+                 AppointmentSelect="@OnAppointmentSelect"
+                 AppointmentRender="@OnAppointmentRender"
+                 AppointmentMove="@OnAppointmentMove">
+    <RadzenYearPlannerView />
+    <RadzenYearTimelineView />
+
+</RadzenScheduler>
+
+
+@code {
+    [Inject]
+    IFeiertageService FeiertageService { get; set; } = default!;
+
+    RadzenScheduler<Appointment> scheduler = default!;
+
+    List<Appointment> appointments = new();
+    bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        System.Diagnostics.Debug.WriteLine("Initialized");
+        await LoadData(DateTime.Now, nameof(OnInitializedAsync));
+        await Task.CompletedTask;
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Task.CompletedTask;
+        if (firstRender)
+        {
+            scheduler?.Reload();
+        }
+    }
+
+    async Task OnLoadData(SchedulerLoadDataEventArgs args)
+    {
+        await LoadData(scheduler.CurrentDate, nameof(OnLoadData));
+    }
+
+    async Task LoadData(DateTime currentDate, string? context = null)
+    {
+        if (isLoading) return;
+        System.Diagnostics.Debug.WriteLine($"LoadData ({context}) date:{currentDate} ");
+        try
+        {
+            isLoading = true;
+
+            appointments.Clear();
+            var feiertage = await FeiertageService.GetFeiertageAsync(currentDate);
+            System.Diagnostics.Debug.WriteLine($"feiertage count: {feiertage.Count()}");
+            appointments.AddRange(feiertage);
+
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+                scheduler?.Reload();
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex.ToString());
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    void OnSlotRender(SchedulerSlotRenderEventArgs args)
+    {
+        // Highlight today in month view
+        if (args.View.Text == "Month" && args.Start.Date == DateTime.Today)
+        {
+            args.Attributes["style"] = "background: rgba(255,220,40,.2);";
+        }
+
+        // Highlight working hours (9-18)
+        if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
+        {
+            args.Attributes["style"] = "background: rgba(255,220,40,.2);";
+        }
+    }
+
+    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
+    {
+
+        // if (args.View.Text != "Year")
+        // {
+        //     Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
+        //         new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
+
+        //     if (data != null)
+        //     {
+        //         appointments.Add(data);
+        //         // Either call the Reload method or reassign the Data property of the Scheduler
+        //         await scheduler.Reload();
+        //     }
+        // }
+
+        await Task.CompletedTask;
+    }
+
+    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
+    {
+
+        // var copy = new Appointment
+        //     {
+        //         Start = args.Data.Start,
+        //         End = args.Data.End,
+        //         Text = args.Data.Text
+        //     };
+
+        // var data = await DialogService.OpenAsync<EditAppointmentPage>("Edit Appointment", new Dictionary<string, object> { { "Appointment", copy } });
+
+        // if (data != null)
+        // {
+        //     // Update the appointment
+        //     args.Data.Start = data.Start;
+        //     args.Data.End = data.End;
+        //     args.Data.Text = data.Text;
+        // }
+
+        await scheduler.Reload();
+    }
+
+    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
+    {
+        // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
+
+        if (args.Data.Text == "Birthday")
+        {
+            args.Attributes["style"] = "background: red";
+        }
+    }
+
+    async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs args)
+    {
+        var draggedAppointment = appointments.FirstOrDefault(x => x == args.Appointment.Data);
+
+        if (draggedAppointment != null)
+        {
+            draggedAppointment.Start = draggedAppointment.Start + args.TimeSpan;
+
+            draggedAppointment.End = draggedAppointment.End + args.TimeSpan;
+
+            await scheduler.Reload();
+        }
+    }
+
+}

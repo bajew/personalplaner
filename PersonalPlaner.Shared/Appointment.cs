@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PersonalPlaner.App.Models
+namespace PersonalPlaner.Blazor.Models
 {
     public class Appointment
     {

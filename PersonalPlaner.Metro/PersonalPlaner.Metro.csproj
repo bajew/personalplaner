@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PersonalPlaner.App\PersonalPlaner.App.csproj" />
+    <ProjectReference Include="..\PersonalPlaner.Blazor\PersonalPlaner.Blazor.csproj" />
     <ProjectReference Include="..\PersonalPlaner\PersonalPlaner.csproj" />
   </ItemGroup>
 

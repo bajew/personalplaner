@@ -1,5 +1,5 @@
 ﻿using PersonalPlaner.Abstractions.FeiertageApi;
-using PersonalPlaner.App.Models;
+using PersonalPlaner.Blazor.Models;
 using PersonalPlaner.Shared.FeiertageApi;
 using System;
 using System.Collections.Generic;
