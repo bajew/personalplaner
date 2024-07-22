@@ -1,9 +1,25 @@
-﻿@page "/Planer"
+﻿@page "/"
+@page "/Planer"
+
+<style>
+    .appText {
+        border-radius:20px;
+        background-color: var(--rz-primary-lighter);
+        font-size: var(--rz-scheduler-header-font-size);
+        color:black
+    }
+
+        .appText::after {
+            content: attr(data-text);
+            white-space:nowrap;
+            font-size:0.8rem;
+        }
+</style>
 
 <SectionContent SectionName="Header">
     <RadzenLabel Text="Personal Planer" />
 </SectionContent>
-<RadzenScheduler style="height:83vh"
+<RadzenScheduler style="height:85vh; zoom:100%"
                  @ref="scheduler"
                  TodayText="Heute"
                  TItem="Appointment"
@@ -15,8 +31,16 @@
                  AppointmentSelect="@OnAppointmentSelect"
                  AppointmentRender="@OnAppointmentRender"
                  AppointmentMove="@OnAppointmentMove">
-    <RadzenYearPlannerView />
-    <RadzenYearTimelineView />
+
+                 <Template>
+
+                 </Template>
+    <ChildContent>
+        <RadzenYearPlannerView />
+        <RadzenYearTimelineView />
+        <RadzenMonthView />
+
+    </ChildContent>
 
 </RadzenScheduler>
 
@@ -24,10 +48,10 @@
 @code {
     [Inject]
     IFeiertageService FeiertageService { get; set; } = default!;
-
     RadzenScheduler<Appointment> scheduler = default!;
-
     List<Appointment> appointments = new();
+    RadzenYearPlannerView zypv;
+    RadzenYearTimelineView asdf;
     bool isLoading = false;
 
     protected override async Task OnInitializedAsync()
@@ -63,6 +87,18 @@
             System.Diagnostics.Debug.WriteLine($"feiertage count: {feiertage.Count()}");
             appointments.AddRange(feiertage);
 
+            appointments.Add(new Appointment()
+                {
+                    Text = "UR DB",
+                    Start = DateTime.Now,
+                    End = DateTime.Now.AddDays(5)
+                });
+            appointments.Add(new Appointment()
+                {
+                    Text = "UR DB",
+                    Start = DateTime.Now.AddDays(6),
+                    End = DateTime.Now.AddDays(10)
+                });
             await InvokeAsync(() =>
             {
                 StateHasChanged();
@@ -142,8 +178,17 @@
 
         if (args.Data.Text == "Birthday")
         {
-            args.Attributes["style"] = "background: red";
         }
+            args.Attributes["style"] = "background: yellowgreen";
+        args.Attributes["ShowAppointmentContent"] = true;
+        args.Attributes["class"] = "appText";
+        args.Attributes["data-text"] = args.Data.Text;
+
+
+        Console.WriteLine("OnAppointmentRender");
+        System.Diagnostics.Debug.WriteLine("OnAppointmentRender");
+
+
     }
 
     async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs args)
